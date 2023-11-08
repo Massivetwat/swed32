@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PlatformTarget>x86</PlatformTarget>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>swedz</Authors>
+    <Company>swed software</Company>
+    <Product>swed32</Product>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <Description>Making ReadProcessMemory and WriteProcessMemory easier :)
+
+check out swedz c# on yt for tutorial.</Description>
+    <Copyright>just credit the channel</Copyright>
+  </PropertyGroup>
+
+</Project>
