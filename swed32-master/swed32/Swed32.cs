@@ -25,11 +25,14 @@ namespace Swed32
         {
             return Proc;
         }
+        
         public Process SetProcess(string procName)
         {
             Proc = Process.GetProcessesByName(procName)[0];
+            
             if (Proc == null)
                 throw new InvalidOperationException("Process was not found, are you using the correct bit version and have no miss-spellings?");
+            
             return Proc;
         }
         
@@ -69,7 +72,6 @@ namespace Swed32
 
             return IntPtr.Zero;
         }
-
 
         public IntPtr ReadPointer(IntPtr addy)
         {
@@ -132,6 +134,7 @@ namespace Swed32
         #endregion
 
         #region READ
+        
         public byte[] ReadBytes(IntPtr addy, int bytes)
         {
             byte[] buffer = new byte[bytes];
@@ -244,14 +247,12 @@ namespace Swed32
             matrix[15] = BitConverter.ToSingle(bytes, 15 * 4);
 
             return matrix;
-
         }
 
         #endregion
 
         #region WRITE
-
-
+        
         public bool WriteBytes(IntPtr address, byte[] newbytes)
         {
             return Kernel32.WriteProcessMemory(Proc.Handle, address, newbytes, newbytes.Length, IntPtr.Zero);
@@ -342,8 +343,8 @@ namespace Swed32
 
         public IntPtr ScanForBytes32(string moduleName, string needle)
         {
-
             ProcessModule module = Proc.Modules.OfType<ProcessModule>().FirstOrDefault(x => x.ModuleName == moduleName);
+            
             if (module == null)
                 throw new InvalidOperationException("module was not found. Check your module name.");
 
@@ -358,10 +359,10 @@ namespace Swed32
                 haystackBytes = new byte[stream.Length];
                 stream.Read(haystackBytes, 0, (int)stream.Length);
             }
+            
             return (IntPtr)ScanForBytes32(haystackBytes, needleBytes);
         }
-
-
+        
         public int ScanForBytes32(byte[] haystack, byte[] needle)
         {
             for (int i = 0; i < haystack.Length - needle.Length; i++)
@@ -369,22 +370,20 @@ namespace Swed32
                 bool found = true;
                 for (int j = 0; j < needle.Length; j++)
                 {
-                    if (haystack[i + j] != needle[j])
-                    {
-                        found = false;
-                        break;
-                    }
+                    if (haystack[i + j] == needle[j]) 
+                        continue;
+                    
+                    found = false;
+                    break;
                 }
+                
                 if (found)
-                {
                     return i;
-                }
             }
+            
             return -1;
         }
+        
         #endregion
-
-
-
     }
 }
