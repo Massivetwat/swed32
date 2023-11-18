@@ -9,45 +9,6 @@ namespace Swed32
 {
     public class Swed
     {
-        #region imports
-
-        [DllImport("Kernel32.dll")]
-
-        static extern bool ReadProcessMemory(
-            IntPtr hProcess,
-            IntPtr lpBaseAddress,
-            [Out] byte[] lpBuffer,
-            int nSize,
-            IntPtr lpNumberOfBytesRead
-            );
-
-
-        [DllImport("kernel32.dll")]
-
-        static extern bool WriteProcessMemory(
-            IntPtr hProcess,
-            IntPtr lpBaseAddress,
-            byte[] lpBuffer,
-            int size,
-            IntPtr lpNumberOfBytesWritten
-            );
-
-        [DllImport("kernel32.dll")]
-        static extern IntPtr CreateFile(
-            string lpFileName,
-            uint dwDesiredAccess,
-            uint dwShareMode,
-            IntPtr lpSecurityAttributes,
-            uint dwCreationDisposition,
-            uint dwFlagsAndAttributes,
-            IntPtr hTemplateFile
-            );
-
-        [DllImport("kernel32.dll")]
-        static extern bool CloseHandle(IntPtr hObject);
-
-        #endregion
-
         public Process Proc { get; set; }
 
         public Swed(string procName)
@@ -113,14 +74,14 @@ namespace Swed32
         public IntPtr ReadPointer(IntPtr addy)
         {
             byte[] buffer = new byte[4];
-            ReadProcessMemory(Proc.Handle, addy, buffer, buffer.Length, IntPtr.Zero);
+            Kernel32.ReadProcessMemory(Proc.Handle, addy, buffer, buffer.Length, IntPtr.Zero);
             return (IntPtr)BitConverter.ToInt32(buffer);
         }
 
         public IntPtr ReadPointer(IntPtr addy, int offset)
         {
             byte[] buffer = new byte[4];
-            ReadProcessMemory(Proc.Handle, addy + offset, buffer, buffer.Length, IntPtr.Zero);
+            Kernel32.ReadProcessMemory(Proc.Handle, addy + offset, buffer, buffer.Length, IntPtr.Zero);
             return (IntPtr)BitConverter.ToInt32(buffer);
         }
 
@@ -130,7 +91,7 @@ namespace Swed32
 
             foreach (var offset in offsets)
             {
-                ReadProcessMemory(Proc.Handle, addy + offset, buffer, buffer.Length, IntPtr.Zero);
+                Kernel32.ReadProcessMemory(Proc.Handle, addy + offset, buffer, buffer.Length, IntPtr.Zero);
             }
 
             return (IntPtr)BitConverter.ToInt32(buffer);
@@ -174,14 +135,14 @@ namespace Swed32
         public byte[] ReadBytes(IntPtr addy, int bytes)
         {
             byte[] buffer = new byte[bytes];
-            ReadProcessMemory(Proc.Handle, addy, buffer, buffer.Length, IntPtr.Zero);
+            Kernel32.ReadProcessMemory(Proc.Handle, addy, buffer, buffer.Length, IntPtr.Zero);
             return buffer;
         }
 
         public byte[] ReadBytes(IntPtr addy, int offset, int bytes)
         {
             byte[] buffer = new byte[bytes];
-            ReadProcessMemory(Proc.Handle, addy + offset, buffer, buffer.Length, IntPtr.Zero);
+            Kernel32.ReadProcessMemory(Proc.Handle, addy + offset, buffer, buffer.Length, IntPtr.Zero);
             return buffer;
         }
 
@@ -293,12 +254,12 @@ namespace Swed32
 
         public bool WriteBytes(IntPtr address, byte[] newbytes)
         {
-            return WriteProcessMemory(Proc.Handle, address, newbytes, newbytes.Length, IntPtr.Zero);
+            return Kernel32.WriteProcessMemory(Proc.Handle, address, newbytes, newbytes.Length, IntPtr.Zero);
         }
 
         public bool WriteBytes(IntPtr address, int offset, byte[] newbytes)
         {
-            return WriteProcessMemory(Proc.Handle, address + offset, newbytes, newbytes.Length, IntPtr.Zero);
+            return Kernel32.WriteProcessMemory(Proc.Handle, address + offset, newbytes, newbytes.Length, IntPtr.Zero);
         }
 
         public bool WriteInt(IntPtr address, int value)
