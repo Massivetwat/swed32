@@ -87,51 +87,27 @@ public class Swed
         return (IntPtr)BitConverter.ToInt32(buffer);
     }
 
-    public IntPtr ReadPointer(IntPtr addy, int[] offsets)
+    public IntPtr ReadPointer(IntPtr addy, params int[] offsets)
     {
-        byte[] buffer = new byte[4];
+        const int szp32 = 4;
+        const int szp64 = 8;
+        
+        byte[] buffer = new byte[IntPtr.Size];
+        Debug.Assert(buffer.Length is szp32 or szp64);
 
         foreach (var offset in offsets)
         {
             Kernel32.ReadProcessMemory(Proc.Handle, addy + offset, buffer, buffer.Length, IntPtr.Zero);
         }
 
-        return (IntPtr)BitConverter.ToInt32(buffer);
+        return buffer.Length switch
+        {
+            szp32 => (IntPtr)BitConverter.ToInt32(buffer),
+            szp64 => (IntPtr)BitConverter.ToInt64(buffer),
+            _ => throw new InvalidCastException(
+                "Buffer wasn't of size 4 or 8 (native-sized integers are not 4 or 8 bytes wide)")
+        };
     }
-
-    #region ReadPointer overloads
-
-    public IntPtr ReadPointer(IntPtr addy, int offset1, int offset2)
-    {
-        return ReadPointer(addy, new int[] { offset1, offset2 });
-    }
-
-    public IntPtr ReadPointer(IntPtr addy, int offset1, int offset2, int offset3)
-    {
-        return ReadPointer(addy, new int[] { offset1, offset2, offset3 });
-    }
-
-    public IntPtr ReadPointer(IntPtr addy, int offset1, int offset2, int offset3, int offset4)
-    {
-        return ReadPointer(addy, new int[] { offset1, offset2, offset3, offset4 });
-    }
-
-    public IntPtr ReadPointer(IntPtr addy, int offset1, int offset2, int offset3, int offset4, int offset5)
-    {
-        return ReadPointer(addy, new int[] { offset1, offset2, offset3, offset4, offset5 });
-    }
-
-    public IntPtr ReadPointer(IntPtr addy, int offset1, int offset2, int offset3, int offset4, int offset5, int offset6)
-    {
-        return ReadPointer(addy, new int[] { offset1, offset2, offset3, offset4, offset5, offset6 });
-    }
-
-    public IntPtr ReadPointer(IntPtr addy, int offset1, int offset2, int offset3, int offset4, int offset5, int offset6, int offset7)
-    {
-        return ReadPointer(addy, new int[] { offset1, offset2, offset3, offset4, offset5, offset6, offset7 });
-    }
-
-    #endregion
 
     #region READ
         
