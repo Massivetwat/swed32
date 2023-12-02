@@ -80,23 +80,29 @@ public partial class Swed
 
     public IntPtr ReadPointer(IntPtr addy, params int[] offsets)
     {
-        const int szp32 = 4;
-        const int szp64 = 8;
+        var buffer = new byte[IntPtr.Size];
         
-        byte[] buffer = new byte[IntPtr.Size];
-        Debug.Assert(buffer.Length is szp32 or szp64);
-
         foreach (var offset in offsets)
         {
             Kernel32.ReadProcessMemory(Proc.Handle, addy + offset, buffer, buffer.Length, IntPtr.Zero);
+            addy = ReadPtrFromBuffer(buffer);
         }
 
+        return addy;
+    }
+
+    private static IntPtr ReadPtrFromBuffer(ReadOnlySpan<byte> buffer)
+    {
+        const int szp32 = 4;
+        const int szp64 = 8;
+        Debug.Assert(buffer.Length is szp32 or szp64 && buffer.Length == IntPtr.Size);
+        
         return buffer.Length switch
         {
             szp32 => (IntPtr)BitConverter.ToInt32(buffer),
             szp64 => (IntPtr)BitConverter.ToInt64(buffer),
             _ => throw new InvalidCastException(
-                "Buffer wasn't of size 4 or 8 (native-sized integers are not 4 or 8 bytes wide)")
+                "Buffer wasn't 4 or 8 bytes wide")
         };
     }
 
