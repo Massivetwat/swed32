@@ -75,16 +75,7 @@ public class Swed
 
     public IntPtr ReadPointer(IntPtr addy)
     {
-        byte[] buffer = new byte[4];
-        Kernel32.ReadProcessMemory(Proc.Handle, addy, buffer, buffer.Length, IntPtr.Zero);
-        return (IntPtr)BitConverter.ToInt32(buffer);
-    }
-
-    public IntPtr ReadPointer(IntPtr addy, int offset)
-    {
-        byte[] buffer = new byte[4];
-        Kernel32.ReadProcessMemory(Proc.Handle, addy + offset, buffer, buffer.Length, IntPtr.Zero);
-        return (IntPtr)BitConverter.ToInt32(buffer);
+        return ReadPointer(addy, 0);
     }
 
     public IntPtr ReadPointer(IntPtr addy, params int[] offsets)
