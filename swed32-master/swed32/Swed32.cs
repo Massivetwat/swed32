@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace Swed32;
 
-public class Swed
+public partial class Swed
 {
     public Process Proc { get; set; }
 
