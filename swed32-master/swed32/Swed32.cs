@@ -194,30 +194,13 @@ public partial class Swed
         return BitConverter.ToUInt32(ReadBytes(address + offset, 4));
     }
 
-    public float[] ReadMatrix(IntPtr address)
+    public float[] ReadMatrix(IntPtr address, int length = 16)
     {
-        var bytes = ReadBytes(address, 4 * 16);
-        var matrix = new float[bytes.Length];
-
-        matrix[0] = BitConverter.ToSingle(bytes, 0 * 4);
-        matrix[1] = BitConverter.ToSingle(bytes, 1 * 4);
-        matrix[2] = BitConverter.ToSingle(bytes, 2 * 4);
-        matrix[3] = BitConverter.ToSingle(bytes, 3 * 4);
-
-        matrix[4] = BitConverter.ToSingle(bytes, 4 * 4);
-        matrix[5] = BitConverter.ToSingle(bytes, 5 * 4);
-        matrix[6] = BitConverter.ToSingle(bytes, 6 * 4);
-        matrix[7] = BitConverter.ToSingle(bytes, 7 * 4);
-
-        matrix[8] = BitConverter.ToSingle(bytes, 8 * 4);
-        matrix[9] = BitConverter.ToSingle(bytes, 9 * 4);
-        matrix[10] = BitConverter.ToSingle(bytes, 10 * 4);
-        matrix[11] = BitConverter.ToSingle(bytes, 11 * 4);
-
-        matrix[12] = BitConverter.ToSingle(bytes, 12 * 4);
-        matrix[13] = BitConverter.ToSingle(bytes, 13 * 4);
-        matrix[14] = BitConverter.ToSingle(bytes, 14 * 4);
-        matrix[15] = BitConverter.ToSingle(bytes, 15 * 4);
+        var matrix = new float[length];
+        var matrixByteSpan = MemoryMarshal.Cast<float, byte>(matrix);
+        
+        var readBytes = ReadBytes(address, matrixByteSpan.Length);
+        readBytes.CopyTo(matrixByteSpan);
 
         return matrix;
     }

@@ -58,5 +58,12 @@ public static class Program
             // 420.69f for all
             Console.WriteLine($"Vectors:\n{string.Join('\n', vectors)}");
         }
+
+        float[] matrix4X4 = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+        fixed (float* mAddy = matrix4X4)
+        {
+            var readMatrix = swed.ReadMatrix(new IntPtr(mAddy));
+            Console.WriteLine($"Matrix floats:\n[{string.Join(",", readMatrix)}]");
+        }
     }
 }
