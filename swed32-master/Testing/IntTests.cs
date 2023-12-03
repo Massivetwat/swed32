@@ -3,58 +3,30 @@
 [TestFixture]
 public unsafe class IntTests
 {
-    private byte[] _bytes = new byte[sizeof(int)];
-    private Swed _swed = new(Process.GetCurrentProcess());
+    private readonly Swed _swed = new(Process.GetCurrentProcess());
+    private readonly MAlloc<int> _malloc = new(1);
 
     [Test]
-    public void ReadIntTest()
+    public void ReadInt()
     {
-        var n = Random.Shared.Next();
-        var nBytes = BitConverter.GetBytes(n);
-        Assert.That(_bytes.Length, Is.EqualTo(nBytes.Length));
-        _bytes = nBytes;
-        
-        fixed (byte* b0 = &_bytes[0])
-        {
-            var safePtr = new IntPtr(b0);
-            var read = _swed.ReadInt(safePtr);
-            Assert.That(read, Is.EqualTo(n));
-        }
+        _malloc.RandomizeBytes();
+        var read = _swed.ReadInt(_malloc.Buffer);
+        Assert.That(read, Is.EqualTo(_malloc.Span[0]));
+
+        _malloc.RandomizeBytes();
+        _swed.Unsafe.ReadStruct(_malloc.Buffer.ToPointer(), out read);
+        Assert.That(read, Is.EqualTo(_malloc.Span[0]));
     }
 
     [Test]
-    public void WriteIntTest()
+    public void WriteInt()
     {
-        var n = Random.Shared.Next();
-        var safePtr = new IntPtr(&n);
-        var read = _swed.ReadInt(safePtr);
+        _malloc.RandomizeBytes();
+        var read = _swed.ReadInt(_malloc.Buffer);
+        Assert.That(read, Is.EqualTo(_malloc.Span[0]));
 
-        Assert.That(read, Is.EqualTo(n));
-    }
-    
-    [Test]
-    public void ReadUIntTest()
-    {
-        var n = (uint)Random.Shared.Next();
-        var nBytes = BitConverter.GetBytes(n);
-        Assert.That(_bytes.Length, Is.EqualTo(nBytes.Length));
-        _bytes = nBytes;
-        
-        fixed (byte* b0 = &_bytes[0])
-        {
-            var safePtr = new IntPtr(b0);
-            var read = _swed.ReadInt(safePtr);
-            Assert.That(read, Is.EqualTo(n));
-        }
-    }
-
-    [Test]
-    public void WriteUIntTest()
-    {
-        var n = (uint)Random.Shared.Next();
-        var safePtr = new IntPtr(&n);
-        var read = _swed.ReadInt(safePtr);
-
-        Assert.That(read, Is.EqualTo(n));
+        _malloc.RandomizeBytes();
+        _swed.Unsafe.WriteStruct(_malloc.Buffer.ToPointer(), ref read);
+        Assert.That(read, Is.EqualTo(_malloc.Span[0]));
     }
 }
