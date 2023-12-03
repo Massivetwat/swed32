@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "swed32", "swed32\swed32.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing", "Testing\Testing.csproj", "{A05E498D-D520-466C-A441-36EEF246564B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{A26EAFDC-AAD6-4D36-A282-9E853260C7B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A05E498D-D520-466C-A441-36EEF246564B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A05E498D-D520-466C-A441-36EEF246564B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A05E498D-D520-466C-A441-36EEF246564B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A26EAFDC-AAD6-4D36-A282-9E853260C7B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A26EAFDC-AAD6-4D36-A282-9E853260C7B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A26EAFDC-AAD6-4D36-A282-9E853260C7B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A26EAFDC-AAD6-4D36-A282-9E853260C7B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

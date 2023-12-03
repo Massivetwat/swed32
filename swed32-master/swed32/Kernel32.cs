@@ -9,7 +9,7 @@ public static class Kernel32
         IntPtr hProcess,
         IntPtr lpBaseAddress,
         [Out] byte[] lpBuffer,
-        int nSize,
+        int size,
         IntPtr lpNumberOfBytesRead
     );
     
@@ -20,6 +20,24 @@ public static class Kernel32
         byte[] lpBuffer,
         int size,
         IntPtr lpNumberOfBytesWritten
+    );
+    
+    [DllImport("Kernel32.dll")]
+    public static extern unsafe bool ReadProcessMemory(
+        void* hProcess,
+        void* lpBaseAddress,
+        void* lpBuffer,
+        nuint nSize,
+        nuint* lpNumberOfBytesRead
+    );
+    
+    [DllImport("kernel32.dll")]
+    public static extern unsafe bool WriteProcessMemory(
+        void* hProcess,
+        void* lpBaseAddress,
+        void* lpBuffer,
+        nuint nSize,
+        nuint* lpNumberOfBytesWritten
     );
 
     [DllImport("kernel32.dll")]

@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace Swed32;
 
-public class Swed
+public partial class Swed
 {
     public Process Proc { get; set; }
 
@@ -75,63 +75,36 @@ public class Swed
 
     public IntPtr ReadPointer(IntPtr addy)
     {
-        byte[] buffer = new byte[4];
-        Kernel32.ReadProcessMemory(Proc.Handle, addy, buffer, buffer.Length, IntPtr.Zero);
-        return (IntPtr)BitConverter.ToInt32(buffer);
+        return ReadPointer(addy, 0);
     }
 
-    public IntPtr ReadPointer(IntPtr addy, int offset)
+    public IntPtr ReadPointer(IntPtr addy, params int[] offsets)
     {
-        byte[] buffer = new byte[4];
-        Kernel32.ReadProcessMemory(Proc.Handle, addy + offset, buffer, buffer.Length, IntPtr.Zero);
-        return (IntPtr)BitConverter.ToInt32(buffer);
-    }
-
-    public IntPtr ReadPointer(IntPtr addy, int[] offsets)
-    {
-        byte[] buffer = new byte[4];
-
+        var buffer = new byte[IntPtr.Size];
+        
         foreach (var offset in offsets)
         {
             Kernel32.ReadProcessMemory(Proc.Handle, addy + offset, buffer, buffer.Length, IntPtr.Zero);
+            addy = ReadPtrFromBuffer(buffer);
         }
 
-        return (IntPtr)BitConverter.ToInt32(buffer);
+        return addy;
     }
 
-    #region ReadPointer overloads
-
-    public IntPtr ReadPointer(IntPtr addy, int offset1, int offset2)
+    private static IntPtr ReadPtrFromBuffer(ReadOnlySpan<byte> buffer)
     {
-        return ReadPointer(addy, new int[] { offset1, offset2 });
+        const int szp32 = 4;
+        const int szp64 = 8;
+        Debug.Assert(buffer.Length is szp32 or szp64 && buffer.Length == IntPtr.Size);
+        
+        return buffer.Length switch
+        {
+            szp32 => (IntPtr)BitConverter.ToInt32(buffer),
+            szp64 => (IntPtr)BitConverter.ToInt64(buffer),
+            _ => throw new InvalidCastException(
+                "Buffer wasn't 4 or 8 bytes wide")
+        };
     }
-
-    public IntPtr ReadPointer(IntPtr addy, int offset1, int offset2, int offset3)
-    {
-        return ReadPointer(addy, new int[] { offset1, offset2, offset3 });
-    }
-
-    public IntPtr ReadPointer(IntPtr addy, int offset1, int offset2, int offset3, int offset4)
-    {
-        return ReadPointer(addy, new int[] { offset1, offset2, offset3, offset4 });
-    }
-
-    public IntPtr ReadPointer(IntPtr addy, int offset1, int offset2, int offset3, int offset4, int offset5)
-    {
-        return ReadPointer(addy, new int[] { offset1, offset2, offset3, offset4, offset5 });
-    }
-
-    public IntPtr ReadPointer(IntPtr addy, int offset1, int offset2, int offset3, int offset4, int offset5, int offset6)
-    {
-        return ReadPointer(addy, new int[] { offset1, offset2, offset3, offset4, offset5, offset6 });
-    }
-
-    public IntPtr ReadPointer(IntPtr addy, int offset1, int offset2, int offset3, int offset4, int offset5, int offset6, int offset7)
-    {
-        return ReadPointer(addy, new int[] { offset1, offset2, offset3, offset4, offset5, offset6, offset7 });
-    }
-
-    #endregion
 
     #region READ
         
@@ -221,30 +194,13 @@ public class Swed
         return BitConverter.ToUInt32(ReadBytes(address + offset, 4));
     }
 
-    public float[] ReadMatrix(IntPtr address)
+    public float[] ReadMatrix(IntPtr address, int length = 16)
     {
-        var bytes = ReadBytes(address, 4 * 16);
-        var matrix = new float[bytes.Length];
-
-        matrix[0] = BitConverter.ToSingle(bytes, 0 * 4);
-        matrix[1] = BitConverter.ToSingle(bytes, 1 * 4);
-        matrix[2] = BitConverter.ToSingle(bytes, 2 * 4);
-        matrix[3] = BitConverter.ToSingle(bytes, 3 * 4);
-
-        matrix[4] = BitConverter.ToSingle(bytes, 4 * 4);
-        matrix[5] = BitConverter.ToSingle(bytes, 5 * 4);
-        matrix[6] = BitConverter.ToSingle(bytes, 6 * 4);
-        matrix[7] = BitConverter.ToSingle(bytes, 7 * 4);
-
-        matrix[8] = BitConverter.ToSingle(bytes, 8 * 4);
-        matrix[9] = BitConverter.ToSingle(bytes, 9 * 4);
-        matrix[10] = BitConverter.ToSingle(bytes, 10 * 4);
-        matrix[11] = BitConverter.ToSingle(bytes, 11 * 4);
-
-        matrix[12] = BitConverter.ToSingle(bytes, 12 * 4);
-        matrix[13] = BitConverter.ToSingle(bytes, 13 * 4);
-        matrix[14] = BitConverter.ToSingle(bytes, 14 * 4);
-        matrix[15] = BitConverter.ToSingle(bytes, 15 * 4);
+        var matrix = new float[length];
+        var matrixByteSpan = MemoryMarshal.Cast<float, byte>(matrix);
+        
+        var readBytes = ReadBytes(address, matrixByteSpan.Length);
+        readBytes.CopyTo(matrixByteSpan);
 
         return matrix;
     }
