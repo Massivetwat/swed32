@@ -3,31 +3,24 @@
 public unsafe class ByteTests
 {
     private Swed _swed = new(Process.GetCurrentProcess());
-    private const int BytesLength = 451_723;
-    private byte[] _bytes = new byte[BytesLength];
+    private MAlloc<byte> _bytes = new(451_723);
 
     [Test]
     public void ReadBytesTest()
     {
-        fixed (byte* b0 = &_bytes[0])
-        {
-            var safePtr = new IntPtr(b0);
-            var buffer = _swed.ReadBytes(safePtr, _bytes.Length);
+        var readBytes = _swed.ReadBytes(_bytes.Buffer, _bytes.Length);
+        Assert.That(readBytes, Is.EquivalentTo(_bytes.Span.ToArray()));
 
-            Assert.That(buffer, Is.EquivalentTo(_bytes));
-        }
+        _swed.Unsafe.ReadStructs<byte>(_bytes.Buffer.ToPointer(), readBytes);
+        Assert.That(readBytes, Is.EquivalentTo(_bytes.Span.ToArray()));
     }
 
     [Test]
     public void WriteBytesTest()
     {
-        fixed (byte* b0 = &_bytes[0])
-        {
-            var safePtr = new IntPtr(b0);
-            var written = _swed.WriteBytes(safePtr, new byte[_bytes.Length]);
+        var written = _swed.WriteBytes(_bytes.Buffer, new byte[_bytes.Length]);
             
-            Assert.That(written, Is.True);
-            Assert.That(Array.TrueForAll(_bytes, b => b == 0), Is.True);
-        }
+        Assert.That(written, Is.True);
+        Assert.That(Array.TrueForAll(_bytes.Span.ToArray(), b => b == 0), Is.True);
     }
 }
