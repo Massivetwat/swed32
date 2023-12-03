@@ -8,6 +8,7 @@ public sealed unsafe class MAlloc<T> : IDisposable
 {
     public int Length { get; }
     private readonly T* _buf;
+    public IntPtr Buffer => new IntPtr(_buf);
     public Span<T> Span => new(_buf, Length);
 
     public MAlloc(int length, bool zero = true)
